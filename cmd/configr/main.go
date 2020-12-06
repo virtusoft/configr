@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var inventory *Inventory
+
 func main() {
 	// TODO: allow user to specify via environment variable the path
 	//       to their inventory file.
@@ -22,7 +24,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	var inventory = NewInventory(configrPath)
+	inventory = NewInventory(configrPath)
 
 	var app = &cli.App{
 		Name:    "configr",
@@ -40,54 +42,71 @@ func main() {
 					Name:  "edit",
 					Usage: "Open a file in vim",
 					Action: func(c *cli.Context) error {
-						var input = c.Args().Get(0)
-						var found bool = false
-						var selectedFile File
-
-						// First check for a path that matches user input.
-						for _, file := range inventory.Files {
-							if input == file.Path {
-								found = true
-								selectedFile = *file
-								break
-							}
-						}
-
-						// If the input doesn't match a path, then see if there is an alias which matches.
-						if !found {
-							for _, file := range inventory.Files {
-								if input == file.Alias {
-									found = true
-									selectedFile = *file
-									break
-								}
-							}
-						}
-
-						if found {
-							editFile(selectedFile.Path)
-						} else {
-							fmt.Printf("No matches found for input: `%s`\n", input)
-						}
-						return nil
+						return cmdEdit(c)
 					},
 				},
 				&cli.Command{
 					Name:  "ls",
 					Usage: "Print list of files",
 					Action: func(c *cli.Context) error {
-						fmt.Printf("ALIAS\t\tPATH\n")
-						for _, file := range inventory.Files {
-							fmt.Printf("%s\t\t%s\n", file.Alias, file.Path)
-						}
-						return nil
+						return cmdListFiles(c)
 					},
 				},
+			},
+		},
+		&cli.Command{
+			Name:  "edit",
+			Usage: "Open a file in vim",
+			Action: func(c *cli.Context) error {
+				return cmdEdit(c)
 			},
 		},
 	}
 
 	app.Run(os.Args)
+
+}
+
+func cmdListFiles(c *cli.Context) error {
+	fmt.Printf("ALIAS\t\tPATH\n")
+	for _, file := range inventory.Files {
+		fmt.Printf("%s\t\t%s\n", file.Alias, file.Path)
+	}
+	return nil
+
+}
+
+func cmdEdit(c *cli.Context) error {
+	var input = c.Args().Get(0)
+	var found bool = false
+	var selectedFile File
+
+	// First check for a path that matches user input.
+	for _, file := range inventory.Files {
+		if input == file.Path {
+			found = true
+			selectedFile = *file
+			break
+		}
+	}
+
+	// If the input doesn't match a path, then see if there is an alias which matches.
+	if !found {
+		for _, file := range inventory.Files {
+			if input == file.Alias {
+				found = true
+				selectedFile = *file
+				break
+			}
+		}
+	}
+
+	if found {
+		editFile(selectedFile.Path)
+	} else {
+		fmt.Printf("No matches found for input: `%s`\n", input)
+	}
+	return nil
 
 }
 
