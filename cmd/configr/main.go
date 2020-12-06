@@ -3,17 +3,19 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/urfave/cli/v2"
 )
 
-var inventory *Inventory
+var (
+	inventory   *Inventory
+	configrPath string
+)
 
 func main() {
 	// TODO: allow user to specify via environment variable the path
 	//       to their inventory file.
-	var configrPath, _ = os.UserHomeDir()
+	configrPath, _ = os.UserHomeDir()
 	configrPath += "/.config/configr/configr.json"
 
 	// If configrPath file doesn't exist, exit with failure.
@@ -43,6 +45,20 @@ func main() {
 					Usage: "Open a file in vim",
 					Action: func(c *cli.Context) error {
 						return cmdEdit(c)
+					},
+				},
+				&cli.Command{
+					Name:  "add",
+					Usage: "Add a new file to the inventory",
+					Action: func(c *cli.Context) error {
+						return cmdAddFile(c)
+					},
+				},
+				&cli.Command{
+					Name:  "rm",
+					Usage: "Remove a file from the inventory",
+					Action: func(c *cli.Context) error {
+						return cmdRemoveFile(c)
 					},
 				},
 				&cli.Command{
@@ -78,46 +94,20 @@ func cmdListFiles(c *cli.Context) error {
 
 func cmdEdit(c *cli.Context) error {
 	var input = c.Args().Get(0)
-	var found bool = false
-	var selectedFile File
+	_, file := inventory.FindFile(input)
 
-	// First check for a path that matches user input.
-	for _, file := range inventory.Files {
-		if input == file.Path {
-			found = true
-			selectedFile = *file
-			break
-		}
-	}
-
-	// If the input doesn't match a path, then see if there is an alias which matches.
-	if !found {
-		for _, file := range inventory.Files {
-			if input == file.Alias {
-				found = true
-				selectedFile = *file
-				break
-			}
-		}
-	}
-
-	if found {
-		editFile(selectedFile.Path)
-	} else {
-		fmt.Printf("No matches found for input: `%s`\n", input)
-	}
+	file.Edit()
 	return nil
-
 }
 
-func editFile(filePath string) {
-	var cmd = exec.Command("vim", filePath)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
-		fmt.Printf("%v\n", err)
-	}
+func cmdAddFile(c *cli.Context) error {
+	var input = c.Args().Get(0)
+	inventory.AddFile(input)
+	return nil
+}
 
+func cmdRemoveFile(c *cli.Context) error {
+	var input = c.Args().Get(0)
+	inventory.RemoveFile(input)
+	return nil
 }

@@ -41,3 +41,59 @@ func NewInventory(inventoryFile string) *Inventory {
 
 	return &inventory
 }
+
+func (i *Inventory) AddFile(input string) error {
+	index, _ := i.FindFile(input)
+
+	if index == -1 {
+		var file = NewFile(input)
+		i.Files = append(i.Files, file)
+		i.WriteToFile()
+	} else {
+		fmt.Println("Err: File already exists in inventory.")
+	}
+
+	return nil
+}
+
+func (i *Inventory) RemoveFile(input string) error {
+	index, _ := i.FindFile(input)
+
+	// If there exists an index
+	if index != -1 {
+		var arr = i.Files
+
+		// TODO: Validate no index out of bound exception.
+		arr = append(arr[:index], arr[index+1:]...)
+		i.Files = arr
+		i.WriteToFile()
+	}
+
+	return nil
+}
+
+func (i *Inventory) FindFile(target string) (index int, file *File) {
+	// First check for a path that matches user input.
+	for index, file := range i.Files {
+		if target == file.Path {
+			return index, file
+		}
+	}
+
+	// If the input doesn't match a path, then see if there is an alias which matches.
+	for index, file := range inventory.Files {
+		if target == file.Alias {
+			return index, file
+		}
+	}
+
+	// If unable to locate file in inventory, return -1 index
+	// and reference to an empty file object.
+	return -1, &File{}
+}
+
+func (i *Inventory) WriteToFile() error {
+	newJsonData, err := json.MarshalIndent(i, "", "\t")
+	ioutil.WriteFile(configrPath, newJsonData, 0644)
+	return err
+}
