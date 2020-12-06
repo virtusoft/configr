@@ -68,6 +68,13 @@ func main() {
 						return cmdListFiles(c)
 					},
 				},
+				&cli.Command{
+					Name:  "inv",
+					Usage: "Edit the inventory file",
+					Action: func(c *cli.Context) error {
+						return cmdEditInventory(c)
+					},
+				},
 			},
 		},
 		&cli.Command{
@@ -97,6 +104,12 @@ func cmdEdit(c *cli.Context) error {
 	_, file := inventory.FindFile(input)
 
 	file.Edit()
+	return nil
+}
+
+func cmdEditInventory(c *cli.Context) error {
+	var invFile = NewFile(configrPath)
+	invFile.Edit()
 	return nil
 }
 
