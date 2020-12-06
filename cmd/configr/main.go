@@ -12,7 +12,7 @@ func main() {
 	// TODO: allow user to specify via environment variable the path
 	//       to their inventory file.
 	var configrPath, _ = os.UserHomeDir()
-	configrPath += "/.configr.json"
+	configrPath += "/.config/configr/configr.json"
 
 	// If configrPath file doesn't exist, exit with failure.
 	// TODO: Create a template file if the file doesnt exist with default
@@ -76,9 +76,9 @@ func main() {
 					Name:  "ls",
 					Usage: "Print list of files",
 					Action: func(c *cli.Context) error {
-						fmt.Printf("PATH\t\t\t\tALIAS\n")
+						fmt.Printf("ALIAS\t\tPATH\n")
 						for _, file := range inventory.Files {
-							fmt.Printf("%s\t\t%s\n", file.Path, file.Alias)
+							fmt.Printf("%s\t\t%s\n", file.Alias, file.Path)
 						}
 						return nil
 					},
