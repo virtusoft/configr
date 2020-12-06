@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -21,10 +23,72 @@ func main() {
 	}
 
 	var inventory = NewInventory(configrPath)
-	var selectedFile = inventory.Files[0]
-	var fd = NewFileData(selectedFile)
 
-	editFile(fd.Path)
+	var app = &cli.App{
+		Name:    "configr",
+		Usage:   "Configuration file management utility",
+		Version: "0.0.1",
+	}
+
+	app.Commands = []*cli.Command{
+		&cli.Command{
+			Name:    "file",
+			Usage:   "Interact with files in the inventory",
+			Aliases: []string{"f"},
+			Subcommands: []*cli.Command{
+				&cli.Command{
+					Name:  "edit",
+					Usage: "Open a file in vim",
+					Action: func(c *cli.Context) error {
+						var input = c.Args().Get(0)
+						var found bool = false
+						var selectedFile File
+
+						// First check for a path that matches user input.
+						for _, file := range inventory.Files {
+							if input == file.Path {
+								found = true
+								selectedFile = *file
+								break
+							}
+						}
+
+						// If the input doesn't match a path, then see if there is an alias which matches.
+						if !found {
+							for _, file := range inventory.Files {
+								if input == file.Alias {
+									found = true
+									selectedFile = *file
+									break
+								}
+							}
+						}
+
+						if found {
+							editFile(selectedFile.Path)
+						} else {
+							fmt.Printf("No matches found for input: `%s`\n", input)
+						}
+						return nil
+					},
+				},
+				&cli.Command{
+					Name:  "ls",
+					Usage: "Print list of files",
+					Action: func(c *cli.Context) error {
+						fmt.Printf("PATH\t\t\t\tALIAS\n")
+						for _, file := range inventory.Files {
+							fmt.Printf("%s\t\t%s\n", file.Path, file.Alias)
+						}
+						return nil
+					},
+				},
+			},
+		},
+	}
+
+	app.Run(os.Args)
+
 }
 
 func editFile(filePath string) {
