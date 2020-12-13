@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 
 type Inventory struct {
@@ -75,7 +76,18 @@ func (i *Inventory) RemoveFile(input string) error {
 func (i *Inventory) FindFile(target string) (index int, file *File) {
 	// First check for a path that matches user input.
 	for index, file := range i.Files {
+		// Check for exact matches.
 		if target == file.Path {
+			return index, file
+		}
+
+		// Check for matches of just the end of the file path.
+		// TODO: If there are file names that are `config`, then
+		//       this check should also include the directory name
+		//       as well when performing the search.
+		var splitPath = strings.Split(file.Path, "/")
+		var fileName = splitPath[len(splitPath)-1]
+		if target == fileName {
 			return index, file
 		}
 	}
