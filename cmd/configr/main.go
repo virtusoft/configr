@@ -110,7 +110,16 @@ func cmdEdit(c *cli.Context) error {
 	var input = c.Args().Get(0)
 	_, file := inventory.FindFile(input)
 
-	file.Edit()
+	// If the file doesn't exist in the inventory,
+	// exit with failure.
+	if file.Path != "" {
+		file.Edit()
+	} else {
+		fmt.Printf("Could not find \"%s\" in the inventory.\n"+
+			"  You may add it with \"configr file add\".\n", input)
+		os.Exit(1)
+	}
+
 	return nil
 }
 
