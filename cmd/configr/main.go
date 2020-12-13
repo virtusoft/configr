@@ -84,6 +84,13 @@ func main() {
 				return cmdEdit(c)
 			},
 		},
+		&cli.Command{
+			Name:  "inv",
+			Usage: "Edit the inventory file",
+			Action: func(c *cli.Context) error {
+				return cmdEditInventory(c)
+			},
+		},
 	}
 
 	app.Run(os.Args)
