@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strings"
 )
 
 type Inventory struct {
@@ -41,6 +40,10 @@ func NewInventory(inventoryFile string) *Inventory {
 	}
 
 	return &inventory
+}
+
+func (i *Inventory) GetFiles() []*File {
+	return i.Files
 }
 
 func (i *Inventory) AddFile(input string) error {
@@ -81,16 +84,7 @@ func (i *Inventory) FindFile(target string) (index int, file *File) {
 			return index, file
 		}
 
-		// Check for matches of just the end of the file path.
-		var splitPath = strings.Split(file.Path, "/")
-		var fileName = splitPath[len(splitPath)-1]
-
-		// If the file name is just `config` also include the directory
-		// in the file name.
-		if fileName == "config" {
-			fileName = fmt.Sprintf("%s/%s", splitPath[(len(splitPath)-2)], fileName)
-		}
-
+		var fileName = file.GetName()
 		if target == fileName {
 			return index, file
 		}

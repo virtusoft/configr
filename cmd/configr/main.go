@@ -8,15 +8,22 @@ import (
 )
 
 var (
-	inventory   *Inventory
-	configrPath string
+	inventory      *Inventory
+	configrPath    string
+	collectionPath string
 )
 
 func main() {
 	// TODO: allow user to specify via environment variable the path
 	//       to their inventory file.
-	configrPath, _ = os.UserHomeDir()
-	configrPath += "/.config/configr/configr.json"
+	var homeDir, _ = os.UserHomeDir()
+
+	configrPath = fmt.Sprintf("%s/%s", homeDir,
+		"/.config/configr/configr.json")
+
+	// TODO: Collection path should be configurable by the user.
+	collectionPath = fmt.Sprintf("%s/%s", homeDir,
+		".cache/configr")
 
 	// If configrPath file doesn't exist, exit with failure.
 	// TODO: Create a template file if the file doesnt exist with default
@@ -73,6 +80,20 @@ func main() {
 					Usage: "Edit the inventory file",
 					Action: func(c *cli.Context) error {
 						return cmdEditInventory(c)
+					},
+				},
+			},
+		},
+		&cli.Command{
+			Name:    "collection",
+			Usage:   "interact with the collection",
+			Aliases: []string{"c"},
+			Subcommands: []*cli.Command{
+				&cli.Command{
+					Name:  "gather",
+					Usage: "Gather files from inventory in one location",
+					Action: func(c *cli.Context) error {
+						return cmdCollectionGather(c)
 					},
 				},
 			},
@@ -138,5 +159,10 @@ func cmdAddFile(c *cli.Context) error {
 func cmdRemoveFile(c *cli.Context) error {
 	var input = c.Args().Get(0)
 	inventory.RemoveFile(input)
+	return nil
+}
+
+func cmdCollectionGather(c *cli.Context) error {
+	Gather()
 	return nil
 }
