@@ -96,6 +96,13 @@ func main() {
 						return cmdCollectionGather(c)
 					},
 				},
+				{
+					Name:  "clear",
+					Usage: "Delete files in collection",
+					Action: func(c *cli.Context) error {
+						return cmdCollectionClear(c)
+					},
+				},
 			},
 		},
 		&cli.Command{
@@ -163,6 +170,11 @@ func cmdRemoveFile(c *cli.Context) error {
 }
 
 func cmdCollectionGather(c *cli.Context) error {
-	Gather()
+	CollectionGather()
+	return nil
+}
+
+func cmdCollectionClear(c *cli.Context) error {
+	CollectionClear()
 	return nil
 }
