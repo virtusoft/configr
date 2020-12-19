@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	inventory      *Inventory
-	configrPath    string
-	collectionPath string
+	inventory   *Inventory
+	collection  *Collection
+	configrPath string
 )
 
 func main() {
@@ -21,10 +21,6 @@ func main() {
 	configrPath = fmt.Sprintf("%s/%s", homeDir,
 		"/.config/configr/configr.json")
 
-	// TODO: Collection path should be configurable by the user.
-	collectionPath = fmt.Sprintf("%s/%s", homeDir,
-		".cache/configr")
-
 	// If configrPath file doesn't exist, exit with failure.
 	// TODO: Create a template file if the file doesnt exist with default
 	//       configuration.
@@ -34,6 +30,10 @@ func main() {
 	}
 
 	inventory = NewInventory(configrPath)
+
+	// TODO: Collection path should be configurable by the user.
+	collection = NewCollection(fmt.Sprintf("%s/%s", homeDir,
+		".cache/configr"))
 
 	var app = &cli.App{
 		Name:    "configr",
@@ -91,7 +91,7 @@ func main() {
 			Subcommands: []*cli.Command{
 				&cli.Command{
 					Name:  "gather",
-					Usage: "Gather files from inventory in one location",
+					Usage: "Gather files from inventory in collection",
 					Action: func(c *cli.Context) error {
 						return cmdCollectionGather(c)
 					},
@@ -170,11 +170,11 @@ func cmdRemoveFile(c *cli.Context) error {
 }
 
 func cmdCollectionGather(c *cli.Context) error {
-	CollectionGather()
+	collection.Gather()
 	return nil
 }
 
 func cmdCollectionClear(c *cli.Context) error {
-	CollectionClear()
+	collection.Clear()
 	return nil
 }
