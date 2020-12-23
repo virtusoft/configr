@@ -97,6 +97,13 @@ func main() {
 					},
 				},
 				{
+					Name:  "deliver",
+					Usage: "Deliver files from collection",
+					Action: func(c *cli.Context) error {
+						return cmdCollectionDeliver(c)
+					},
+				},
+				{
 					Name:  "clear",
 					Usage: "Delete files in collection",
 					Action: func(c *cli.Context) error {
@@ -171,6 +178,11 @@ func cmdRemoveFile(c *cli.Context) error {
 
 func cmdCollectionGather(c *cli.Context) error {
 	collection.Gather()
+	return nil
+}
+
+func cmdCollectionDeliver(c *cli.Context) error {
+	collection.Deliver()
 	return nil
 }
 

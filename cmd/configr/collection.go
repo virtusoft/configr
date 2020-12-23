@@ -6,35 +6,60 @@ import (
 )
 
 type Collection struct {
-	Path  string
-	Files []*File
+	Path string
+	Data []*CollectionData
+}
+
+type CollectionData struct {
+	SourceFile *File
+	CopyFile   *File
 }
 
 func NewCollection(path string) *Collection {
 	var collection = Collection{}
+	var files = inventory.GetFiles()
+	var colData *CollectionData
+
 	collection.Path = path
-	collection.Files = inventory.GetFiles()
+	for _, f := range files {
+		colData = NewCollectionData(f.Path, path)
+		collection.Data = append(collection.Data, colData)
+	}
+
 	return &collection
 }
 
-func (c *Collection) Gather() {
-	var fileName, copyDest string
+func NewCollectionData(sourceFilePath, collectionPath string) *CollectionData {
+	var collectionData = CollectionData{}
+	var fileName, copyFilePath string
 
+	collectionData.SourceFile = NewFile(sourceFilePath)
+	fileName = collectionData.SourceFile.GetName()
+	copyFilePath = fmt.Sprintf("%s/%s", collectionPath, fileName)
+
+	collectionData.CopyFile = NewFile(copyFilePath)
+	return &collectionData
+}
+
+func (c *Collection) Gather() {
 	// Copy all files from the inventory to a directory
-	for _, f := range c.Files {
-		fileName = f.GetName()
-		copyDest = fmt.Sprintf("%s/%s", c.Path, fileName)
-		f.Copy(copyDest)
+	for _, cd := range c.Data {
+		cd.SourceFile.Copy(cd.CopyFile.Path)
+		// TODO: fix issue with files named `config` not being copied.
+	}
+}
+
+func (c *Collection) Deliver() {
+	// Copy all files from collection to inventory locations
+	for _, cd := range c.Data {
+		cd.CopyFile.Copy(cd.SourceFile.Path)
 		// TODO: fix issue with files named `config` not being copied.
 	}
 }
 
 func (c *Collection) Clear() {
-	var fileName, removeFileName string
-
-	for _, f := range c.Files {
-		fileName = f.GetName()
-		removeFileName = fmt.Sprintf("%s/%s", c.Path, fileName)
-		os.Remove(removeFileName)
+	// Remove all files from collection
+	for _, cd := range c.Data {
+		os.Remove(cd.CopyFile.Path)
 	}
 }
