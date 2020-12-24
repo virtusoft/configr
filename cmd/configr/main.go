@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/darrienkennedy/configfile"
 	"github.com/urfave/cli/v2"
 )
 
 var (
 	configrPath   string
+	configMap     map[string]string
+	configFile    *configfile.ConfigFile
 	inventory     *Inventory
 	collection    *Collection
 	inventoryFile *File
@@ -21,6 +24,20 @@ func main() {
 
 	configrPath = fmt.Sprintf("%s/%s", homeDir,
 		"/.config/configr")
+
+	// Initialize configfile based on configrPath
+	configFile = configfile.NewConfigFile(fmt.Sprintf("%s/%s", configrPath, "configr.conf"))
+	configFile.ConfigData = []*configfile.ConfigData{
+		configfile.NewConfigData("collectionPath"),
+	}
+	configFile.CreateDefault = true
+
+	err := configFile.Read()
+	if err != nil {
+		fmt.Printf("Err: could not find configuration file at %s\n", configFile.Path)
+		os.Exit(1)
+	}
+	configMap = configFile.MapConfigs()
 
 	// Initialize inventoryFile variable based on configrPath
 	inventoryFile = NewFile(fmt.Sprintf("%s/%s", configrPath, "inventory.json"))
@@ -35,9 +52,9 @@ func main() {
 
 	inventory = NewInventory(inventoryFile.Path)
 
-	// TODO: Collection path should be configurable by the user.
-	collection = NewCollection(fmt.Sprintf("%s/%s", homeDir,
-		".cache/configr"))
+	// Initialize the collection based on the provided value in the config file
+	// for `collectionPath`
+	collection = NewCollection(configMap["collectionPath"])
 
 	var app = &cli.App{
 		Name:    "configr",
@@ -116,6 +133,14 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:    "config",
+			Usage:   "Edit configr configuration settings",
+			Aliases: []string{"conf"},
+			Action: func(c *cli.Context) error {
+				return cmdConfig(c)
+			},
+		},
 		&cli.Command{
 			Name:  "edit",
 			Usage: "Open a file in vim",
@@ -192,5 +217,11 @@ func cmdCollectionDeliver(c *cli.Context) error {
 
 func cmdCollectionClear(c *cli.Context) error {
 	collection.Clear()
+	return nil
+}
+
+func cmdConfig(c *cli.Context) error {
+	var configrConfigFile = NewFile(configFile.Path)
+	configrConfigFile.Edit()
 	return nil
 }
