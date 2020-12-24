@@ -104,6 +104,6 @@ func (i *Inventory) FindFile(target string) (index int, file *File) {
 
 func (i *Inventory) WriteToFile() error {
 	newJsonData, err := json.MarshalIndent(i, "", "\t")
-	ioutil.WriteFile(configrPath, newJsonData, 0644)
+	ioutil.WriteFile(inventoryFile.Path, newJsonData, 0644)
 	return err
 }

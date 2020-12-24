@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	inventory   *Inventory
-	collection  *Collection
-	configrPath string
+	configrPath   string
+	inventory     *Inventory
+	collection    *Collection
+	inventoryFile *File
 )
 
 func main() {
@@ -19,17 +20,20 @@ func main() {
 	var homeDir, _ = os.UserHomeDir()
 
 	configrPath = fmt.Sprintf("%s/%s", homeDir,
-		"/.config/configr/configr.json")
+		"/.config/configr")
+
+	// Initialize inventoryFile variable based on configrPath
+	inventoryFile = NewFile(fmt.Sprintf("%s/%s", configrPath, "inventory.json"))
 
 	// If configrPath file doesn't exist, exit with failure.
 	// TODO: Create a template file if the file doesnt exist with default
 	//       configuration.
-	if _, err := os.Stat(configrPath); os.IsNotExist(err) {
-		fmt.Printf("Err: could not find file at %s\n", configrPath)
+	if _, err := os.Stat(inventoryFile.Path); os.IsNotExist(err) {
+		fmt.Printf("Err: could not find file at %s\n", inventoryFile.Path)
 		os.Exit(1)
 	}
 
-	inventory = NewInventory(configrPath)
+	inventory = NewInventory(inventoryFile.Path)
 
 	// TODO: Collection path should be configurable by the user.
 	collection = NewCollection(fmt.Sprintf("%s/%s", homeDir,
@@ -159,7 +163,7 @@ func cmdEdit(c *cli.Context) error {
 }
 
 func cmdEditInventory(c *cli.Context) error {
-	var invFile = NewFile(configrPath)
+	var invFile = NewFile(inventoryFile.Path)
 	invFile.Edit()
 	return nil
 }
