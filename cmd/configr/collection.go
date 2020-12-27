@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Collection struct {
@@ -35,7 +35,7 @@ func NewCollectionData(sourceFilePath, collectionPath string) *CollectionData {
 
 	collectionData.SourceFile = NewFile(sourceFilePath)
 	fileName = collectionData.SourceFile.GetName()
-	copyFilePath = fmt.Sprintf("%s/%s", collectionPath, fileName)
+	copyFilePath = filepath.Join(collectionPath, fileName)
 
 	collectionData.CopyFile = NewFile(copyFilePath)
 	return &collectionData

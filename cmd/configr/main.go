@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/darrienkennedy/configfile"
 	"github.com/urfave/cli/v2"
@@ -22,11 +23,10 @@ func main() {
 	//       to their inventory file.
 	var homeDir, _ = os.UserHomeDir()
 
-	configrPath = fmt.Sprintf("%s/%s", homeDir,
-		"/.config/configr")
+	configrPath = filepath.Join(homeDir, ".config/configr")
 
 	// Initialize configfile based on configrPath
-	configFile = configfile.NewConfigFile(fmt.Sprintf("%s/%s", configrPath, "configr.conf"))
+	configFile = configfile.NewConfigFile(filepath.Join(configrPath, "configr.conf"))
 	configFile.ConfigData = []*configfile.ConfigData{
 		configfile.NewConfigData("collectionPath"),
 	}
@@ -40,7 +40,7 @@ func main() {
 	configMap = configFile.MapConfigs()
 
 	// Initialize inventoryFile variable based on configrPath
-	inventoryFile = NewFile(fmt.Sprintf("%s/%s", configrPath, "inventory.json"))
+	inventoryFile = NewFile(filepath.Join(configrPath, "inventory.json"))
 
 	// If configrPath file doesn't exist, exit with failure.
 	// TODO: Create a template file if the file doesnt exist with default
