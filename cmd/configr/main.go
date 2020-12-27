@@ -19,11 +19,13 @@ var (
 )
 
 func main() {
-	// TODO: allow user to specify via environment variable the path
-	//       to their inventory file.
 	var homeDir, _ = os.UserHomeDir()
-
 	configrPath = filepath.Join(homeDir, ".config/configr")
+
+	// Create the configrPath directory if it doesn't already exist
+	if _, err := os.Stat(configrPath); os.IsNotExist(err) {
+		os.MkdirAll(configrPath, os.ModePerm)
+	}
 
 	// Initialize configfile based on configrPath
 	configFile = configfile.NewConfigFile(filepath.Join(configrPath, "configr.conf"))
@@ -32,25 +34,20 @@ func main() {
 	}
 	configFile.CreateDefault = true
 
-	err := configFile.Read()
-	if err != nil {
-		fmt.Printf("Err: could not find configuration file at %s\n", configFile.Path)
-		os.Exit(1)
-	}
+	configFile.Read()
 	configMap = configFile.MapConfigs()
 
 	// Initialize inventoryFile variable based on configrPath
 	inventoryFile = NewFile(filepath.Join(configrPath, "inventory.json"))
 
-	// If configrPath file doesn't exist, exit with failure.
-	// TODO: Create a template file if the file doesnt exist with default
-	//       configuration.
+	// If inventory file does not exist on the system,
+	// create an empty valid inventory file.
 	if _, err := os.Stat(inventoryFile.Path); os.IsNotExist(err) {
-		fmt.Printf("Err: could not find file at %s\n", inventoryFile.Path)
-		os.Exit(1)
+		inventory = &Inventory{}
+		inventory.WriteToFile()
+	} else {
+		inventory = NewInventory(inventoryFile.Path)
 	}
-
-	inventory = NewInventory(inventoryFile.Path)
 
 	// Initialize the collection based on the provided value in the config file
 	// for `collectionPath`

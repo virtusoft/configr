@@ -67,7 +67,6 @@ func (i *Inventory) RemoveFile(input string) error {
 	if index != -1 {
 		var arr = i.Files
 
-		// TODO: Validate no index out of bound exception.
 		arr = append(arr[:index], arr[index+1:]...)
 		i.Files = arr
 		i.WriteToFile()
