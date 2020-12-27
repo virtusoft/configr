@@ -51,10 +51,14 @@ func (i *Inventory) AddFile(input string) error {
 
 	if index == -1 {
 		var file = NewFile(input)
-		i.Files = append(i.Files, file)
-		i.WriteToFile()
+		if file.Exists() {
+			i.Files = append(i.Files, file)
+			i.WriteToFile()
+		} else {
+			fmt.Printf("Err: File '%s' doesn't exist on system.\n", input)
+		}
 	} else {
-		fmt.Println("Err: File already exists in inventory.")
+		fmt.Printf("Err: File '%s' already exists in inventory.\n", input)
 	}
 
 	return nil

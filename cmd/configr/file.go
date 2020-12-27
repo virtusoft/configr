@@ -29,6 +29,14 @@ func (f *File) Edit() error {
 	return err
 }
 
+func (f *File) Exists() bool {
+	if _, err := os.Stat(f.Path); os.IsNotExist(err) {
+		return false
+	} else {
+		return true
+	}
+}
+
 func (f *File) Copy(toPath string) error {
 	// Open file to copy from.
 	from, err := os.Open(f.Path)

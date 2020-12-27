@@ -155,7 +155,6 @@ func main() {
 	}
 
 	app.Run(os.Args)
-
 }
 
 func cmdListFiles(c *cli.Context) error {
@@ -164,7 +163,6 @@ func cmdListFiles(c *cli.Context) error {
 		fmt.Printf("%s\t\t%s\n", file.Alias, file.Path)
 	}
 	return nil
-
 }
 
 func cmdEdit(c *cli.Context) error {
