@@ -128,6 +128,13 @@ func main() {
 						return cmdCollectionClear(c)
 					},
 				},
+				{
+					Name:  "path",
+					Usage: "Print the path to the collection",
+					Action: func(c *cli.Context) error {
+						return cmdCollectionPath(c)
+					},
+				},
 			},
 		},
 		{
@@ -212,6 +219,11 @@ func cmdCollectionDeliver(c *cli.Context) error {
 
 func cmdCollectionClear(c *cli.Context) error {
 	collection.Clear()
+	return nil
+}
+
+func cmdCollectionPath(c *cli.Context) error {
+	fmt.Println(collection.Path)
 	return nil
 }
 
