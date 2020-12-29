@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 )
 
@@ -69,7 +68,10 @@ func (f *File) GetName() string {
 	// If the file name is just `config` also include the directory
 	// in the file name.
 	if fileName == "config" {
-		fileName = filepath.Join(splitPath[(len(splitPath)-2)], fileName)
+		fileName = strings.Join([]string{
+			splitPath[(len(splitPath) - 2)],
+			fileName,
+		}, "_")
 	}
 
 	return fileName

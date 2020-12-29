@@ -45,7 +45,6 @@ func (c *Collection) Gather() {
 	// Copy all files from the inventory to a directory
 	for _, cd := range c.Data {
 		cd.SourceFile.Copy(cd.CopyFile.Path)
-		// TODO: fix issue with files named `config` not being copied.
 	}
 }
 
@@ -53,7 +52,6 @@ func (c *Collection) Deliver() {
 	// Copy all files from collection to inventory locations
 	for _, cd := range c.Data {
 		cd.CopyFile.Copy(cd.SourceFile.Path)
-		// TODO: fix issue with files named `config` not being copied.
 	}
 }
 
