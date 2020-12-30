@@ -50,6 +50,8 @@ func (c *Collection) Gather() {
 
 func (c *Collection) Deliver() {
 	// Copy all files from collection to inventory locations
+	// TODO: Warn user of files that will change before copying
+	// TODO: Create a cache for backups of files that have been changed
 	for _, cd := range c.Data {
 		cd.CopyFile.Copy(cd.SourceFile.Path)
 	}

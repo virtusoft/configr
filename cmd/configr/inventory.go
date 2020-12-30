@@ -10,10 +10,12 @@ type Inventory struct {
 	Files []*File
 }
 
+// TODO: Consider removing InventoryData and just using Inventory instead
 type InventoryData struct {
 	Files []InventoryFileData
 }
 
+// TODO: Remove InventoryFileData, instead should use struct File
 type InventoryFileData struct {
 	Path  string
 	Alias string

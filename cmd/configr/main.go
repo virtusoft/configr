@@ -165,6 +165,7 @@ func main() {
 }
 
 func cmdListFiles(c *cli.Context) error {
+	// TODO: Fix formatting issues with tabs and columns
 	fmt.Printf("ALIAS\t\tPATH\n")
 	for _, file := range inventory.Files {
 		fmt.Printf("%s\t\t%s\n", file.Alias, file.Path)
