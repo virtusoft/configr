@@ -67,7 +67,7 @@ func (f *File) GetName() string {
 
 	// If the file name is just `config` also include the directory
 	// in the file name.
-	if fileName == "config" {
+	if fileName == "config" || fileName == "config.yml" || fileName == "config.json" {
 		fileName = strings.Join([]string{
 			splitPath[(len(splitPath) - 2)],
 			fileName,
